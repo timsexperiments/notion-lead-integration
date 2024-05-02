@@ -14,10 +14,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useForwardRef } from '@/hooks/use-forward-ref';
 import { cn } from '@/lib/utils';
 import { faCaretDown, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export type ComboboxOption = {
   key?: string;
@@ -27,11 +28,12 @@ export type ComboboxOption = {
 
 export type ComboboxProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type'
+  'type' | 'onChange'
 > & {
   options?: ComboboxOption[];
   empty?: React.ReactNode;
   onSearch?: (search: string) => void;
+  onChange?: (value: string, target: HTMLInputElement) => void;
 };
 
 const ComboboxComponent = (
@@ -41,14 +43,22 @@ const ComboboxComponent = (
     value: initialValue = '',
     placeholder = 'Select an item...',
     empty = 'No items found.',
+    onChange,
     onSearch,
     ...props
   }: ComboboxProps,
-  ref: React.ForwardedRef<HTMLInputElement>
+  forwardedRef: React.ForwardedRef<HTMLInputElement>
 ) => {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(initialValue);
   const [displayName, setDisplayName] = React.useState('Select property...');
+  const ref = useForwardRef(forwardedRef);
+
+  useEffect(() => {
+    if (ref.current && onChange && typeof value === 'string') {
+      onChange(value, ref.current);
+    }
+  }, [value, ref, onChange]);
 
   return (
     <>
@@ -82,6 +92,7 @@ const ComboboxComponent = (
                     key={option.key ?? option.value}
                     value={option.value}
                     onSelect={(currentValue) => {
+                      console.log('The value was changed');
                       setValue(currentValue === value ? '' : currentValue);
                       setDisplayName(option.displayName);
                       setOpen(false);
@@ -106,5 +117,7 @@ const ComboboxComponent = (
 };
 
 export const Combobox = React.forwardRef(ComboboxComponent);
+
+Combobox.displayName = 'Combobox';
 
 export default Combobox;

@@ -1,3 +1,4 @@
+import { fetchLeadRecords } from '@/lib/notion/lead';
 import UploadForm from './components/upload-form';
 
 export default async function Home() {
@@ -12,7 +13,7 @@ export default async function Home() {
             Upload photos associated with a specific address and view them in a
             gallery.
           </p>
-          <UploadForm />
+          <UploadForm leadOptions={await fetchLeadRecords()} />
         </div>
       </div>
     </main>

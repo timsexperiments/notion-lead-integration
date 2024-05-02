@@ -2,7 +2,7 @@
 
 import { createOneDriveClient } from '@/lib/onedrive/client';
 
-export async function uploadFiles(_prevState: any, data: FormData) {
+export async function uploadFiles(data: FormData) {
   const onedrive = createOneDriveClient();
 
   const address = data.get('address')! as string;
@@ -10,7 +10,7 @@ export async function uploadFiles(_prevState: any, data: FormData) {
 
   const failed = [];
   const success = [];
-  const baseUploadPath = `awake-solar/project-upload/${address.replace(' ', '_')}/`;
+  const baseUploadPath = `awake-solar/project-upload/${address.replaceAll(' ', '_')}/`;
   for (const file of files) {
     const fileParts = file.name.split('.');
     const extension =
@@ -37,6 +37,8 @@ export async function uploadFiles(_prevState: any, data: FormData) {
   }
 
   const message = messageParts.join(' ');
-  console.log(message);
-  return { message: message, failed: failed.length, success: success.length };
+
+  if (failed.length > 0) {
+    throw new Error(message);
+  }
 }

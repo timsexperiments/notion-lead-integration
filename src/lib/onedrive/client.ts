@@ -20,6 +20,88 @@ interface UploadFileResponse {
   lastModifiedDateTime: string;
 }
 
+export type GetFilesResponse = {
+  '@odata.context': string;
+  value: {
+    '@microsoft.graph.downloadUrl': string;
+    '@microsoft.graph.Decorator': string;
+    createdBy: {
+      application: {
+        id: string;
+        displayName: string;
+      };
+      user: {
+        displayName: string;
+      };
+    };
+    createdDateTime: string;
+    eTag: string;
+    id: string;
+    lastModifiedBy: {
+      application: {
+        id: string;
+        displayName: string;
+      };
+      user: {
+        displayName: string;
+      };
+    };
+    lastModifiedDateTime: string;
+    name: string;
+    parentReference: {
+      driveType: string;
+      driveId: string;
+      id: string;
+      name: string;
+      path: string;
+      siteId: string;
+    };
+    webUrl: string;
+    cTag: string;
+    file: {
+      hashes: {
+        quickXorHash: string;
+      };
+      mimeType: string;
+    };
+    fileSystemInfo: {
+      createdDateTime: string;
+      lastModifiedDateTime: string;
+    };
+    image: {
+      height: number;
+      width: number;
+    };
+    location: {
+      address: {
+        city: string;
+        countryOrRegion: string;
+        locality: string;
+        postalCode: string;
+        state: string;
+      };
+      coordinates: {
+        altitude: number;
+        latitude: number;
+        longitude: number;
+      };
+      displayName: string;
+    };
+    photo: {
+      cameraMake: string;
+      cameraModel: string;
+      exposureDenominator: number;
+      exposureNumerator: number;
+      fNumber: number;
+      focalLength: number;
+      iso: number;
+      orientation: string;
+      takenDateTime: string;
+    };
+    size: number;
+  }[];
+};
+
 export class OneDriveClient {
   private readonly tokenEndpoint: string;
 
@@ -63,27 +145,23 @@ export class OneDriveClient {
     }
   }
 
-  // getFiles = async () => {
-  //   const getURL = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children`;
-  //   const response = await fetch(getURL, {
-  //     method: 'GET',
-  //     headers: {
-  //       Authorization: `Bearer ${this.accessToken}`,
-  //     },
-  //   });
+  getFiles = async (location: string) => {
+    await this.ensureAccessToken();
+    const getURL = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root:/${location}:/children`;
+    console.log(getURL);
+    const response = await fetch(getURL, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    });
 
-  //   console.log(inspect(await response.json()));
-
-  //   const getURL2 = `https://graph.microsoft.com/v1.0/drives`;
-  //   const response2 = await fetch(getURL2, {
-  //     method: 'GET',
-  //     headers: {
-  //       Authorization: `Bearer ${this.accessToken}`,
-  //     },
-  //   });
-
-  //   console.log(inspect(await response2.json()));
-  // };
+    const data: GetFilesResponse = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to get files: ${inspect(data)}`);
+    }
+    return data.value;
+  };
 
   uploadFile = async (filePath: string, fileContent: Buffer) => {
     await this.ensureAccessToken();
