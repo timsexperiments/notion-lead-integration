@@ -92,7 +92,6 @@ const ComboboxComponent = (
                     key={option.key ?? option.value}
                     value={option.value}
                     onSelect={(currentValue) => {
-                      console.log('The value was changed');
                       setValue(currentValue === value ? '' : currentValue);
                       setDisplayName(option.displayName);
                       setOpen(false);
