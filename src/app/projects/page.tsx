@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateMetadata({
   searchParams,
