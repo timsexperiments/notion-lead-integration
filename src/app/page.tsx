@@ -1,6 +1,10 @@
 import { fetchLeadRecords } from '@/lib/notion/lead';
 import UploadForm from './components/upload-form';
 
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Home() {
   return (
     <main className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
